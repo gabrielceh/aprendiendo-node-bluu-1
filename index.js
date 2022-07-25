@@ -4,29 +4,56 @@ const express = require('express');
 const session = require('express-session');
 // npm i connect-flash
 const flash = require('connect-flash');
-// LLamamos a las variables de entorno
-require('dotenv').config();
-// LLamamos a la base de datos
-require('./database/db');
 //  npm install passport
 const passport = require('passport');
+// npm install connect-mongo
+const MongoStore = require('connect-mongo');
 // npm i express-handlebars
 // https://www.npmjs.com/package/express-handlebars
 const { create } = require('express-handlebars');
 // npm install csurf
 //nos sirve para validar que los datos que le enviemos sean de nuestra pagina
 const csurf = require('csurf');
+// npm i express-mongo-sanitize
+// evita la inyeccion de codigo a mongo
+const mongoSanitize = require('express-mongo-sanitize');
+// npm install cors
+// https://expressjs.com/en/resources/middleware/cors.html
+const cors = require('cors');
+
+// LLamamos a las variables de entorno
+require('dotenv').config();
+// LLamamos a la base de datos
+// require('./database/db');
+const clientDB = require('./database/db');
 
 const User = require('./models/User');
 const app = express();
 
+const corsOptions = {
+  credentials: true,
+  origin: process.env.PATHHEROKU || '*',
+  methods: ['GET', 'POST'],
+};
+
+app.use(cors(corsOptions));
+
 // https://expressjs.com/en/resources/middleware/session.html
 app.use(
   session({
-    secret: 'Mi llave ultra secreta',
+    secret: process.env.SECRETSESSION,
     resave: false,
     saveUninitialized: false,
-    name: 'nombre_de_mi_cookie',
+    name: 'user-session',
+    store: MongoStore.create({
+      clientPromise: clientDB,
+      // Nombre de la base de datos
+      dbName: process.env.DBNAME,
+    }),
+    cookie: {
+      secure: process.env.MODE === 'production',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    },
   })
 );
 // https://www.npmjs.com/package/connect-flash
@@ -93,6 +120,7 @@ app.set('views', './views');
 app.use(express.urlencoded({ extended: true }));
 
 app.use(csurf());
+app.use(mongoSanitize());
 // Middleware de csurf para usarlo de forma global y no tener que colocarlo en cada ruta
 app.use((req, res, next) => {
   res.locals.csrfToken = req.csrfToken();

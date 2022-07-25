@@ -45,8 +45,8 @@ const registerUser = async (req, res) => {
       host: 'smtp.mailtrap.io',
       port: 2525,
       auth: {
-        user: process.env.userEmail,
-        pass: process.env.passEmail,
+        user: process.env.USEREMAIL,
+        pass: process.env.PASSEMAIL,
       },
     });
 
@@ -56,7 +56,9 @@ const registerUser = async (req, res) => {
       to: user.email, // list of receivers
       subject: 'Check your account ✔', // Subject line
       // text: "Hello world?", // plain text body
-      html: `<a href="http://localhost:5000/auth/confirm-account/${user.tokenConfirm}">Check your account here!</a>`, // html body
+      html: `<a href="${PATHHEROKU || 'http://localhost:5000'}/auth/confirm-account/${
+        user.tokenConfirm
+      }">Check your account here!</a>`, // html body
     });
 
     // res.json(user);
