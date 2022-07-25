@@ -1,6 +1,17 @@
 const User = require('../models/User');
 const { nanoid } = require('nanoid');
 const { validationResult } = require('express-validator');
+// npm install nodemailer
+const nodemailer = require('nodemailer');
+require('dotenv').config();
+
+const registerForm = (req, res) => {
+  // csrfToken es el token de csurf para validar que el formulario sea de nuestro
+  return res.render('register', {
+    // messages: req.flash('messages'),
+    // csrfToken: req.csrfToken(),
+  });
+};
 
 const registerUser = async (req, res) => {
   // console.log(req.body);
@@ -27,6 +38,27 @@ const registerUser = async (req, res) => {
     });
     // Guarda en la base de datos
     await user.save();
+    //Emulamos el envio del correo electronico mediante Mailtrap
+    // https://mailtrap.io/
+    // https://nodemailer.com/about/
+    const transport = nodemailer.createTransport({
+      host: 'smtp.mailtrap.io',
+      port: 2525,
+      auth: {
+        user: process.env.userEmail,
+        pass: process.env.passEmail,
+      },
+    });
+
+    // send mail with defined transport object
+    await transport.sendMail({
+      from: '"Fred Foo 👻" <foo@example.com>', // sender address
+      to: user.email, // list of receivers
+      subject: 'Check your account ✔', // Subject line
+      // text: "Hello world?", // plain text body
+      html: `<a href="http://localhost:5000/auth/confirm-account/${user.tokenConfirm}">Check your account here!</a>`, // html body
+    });
+
     // res.json(user);
     req.flash('messages', [
       { msg: 'Registered user successfully. Check your email and validate your account' },
@@ -57,12 +89,11 @@ const confirmAccount = async (req, res) => {
   }
 };
 
-const registerForm = (req, res) => {
-  return res.render('register', { messages: req.flash('messages') });
-};
-
 const loginForm = (req, res) => {
-  res.render('login', { messages: req.flash('messages') });
+  res.render('login', {
+    // messages: req.flash('messages'),
+    // csrfToken: req.csrfToken(),
+  });
 };
 
 const loginUser = async (req, res) => {
@@ -82,7 +113,7 @@ const loginUser = async (req, res) => {
 
     if (!(await user.comparePassword(password))) throw new Error('Invalid email or password');
 
-    // Passport: creando la sesion de usuario
+    // Passport: creando la sesion de usuario, recibe al usuario para poder hacer el serializeUser
     req.login(user, function (err) {
       if (err) throw new Error('Error creating session');
       return res.redirect('/');

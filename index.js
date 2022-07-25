@@ -13,6 +13,10 @@ const passport = require('passport');
 // npm i express-handlebars
 // https://www.npmjs.com/package/express-handlebars
 const { create } = require('express-handlebars');
+// npm install csurf
+//nos sirve para validar que los datos que le enviemos sean de nuestra pagina
+const csurf = require('csurf');
+
 const User = require('./models/User');
 const app = express();
 
@@ -56,6 +60,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 //Esto creara la sesion del usuario
+// El req.user funcionara si lo creamos aqui, de lo contrario no estara disponible
+// estos datos vienen de la ruta de login, mediante el metodo req.login
 passport.serializeUser((user, done) =>
   done(null, {
     id: user._id,
@@ -85,6 +91,16 @@ app.set('views', './views');
 
 // habilitamos los formularios antes de las rutas
 app.use(express.urlencoded({ extended: true }));
+
+app.use(csurf());
+// Middleware de csurf para usarlo de forma global y no tener que colocarlo en cada ruta
+app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken();
+  //Para no tener que llamar a req.flash en las rutas que reenderizan
+  res.locals.messages = req.flash('messages');
+  next();
+});
+
 //Llamamos a las rutas que estan en router
 app.use('/', require('./routes/home'));
 app.use('/auth', require('./routes/auth'));

@@ -1,0 +1,19 @@
+<h1 class="text-center">{{user.username}}</h1>
+<p class="text-center">Edit your profile</p>
+<div class="my-5 text-center ">
+  {{#if img}}
+  <img class="rounded-circle" width="200" height="200" src="/assets/profiles/{{img}}" alt="default">
+   {{else}} 
+    <img class="rounded-circle" src="/assets/profiles/profile.jpg" alt="default">
+  {{/if}}
+</div>
+
+{{!-- multipart/form-data es para que se puedan leer archivos --}}
+{{!-- /profile?_csrf={{csrfToken}} agregarlo solo para los formularios con imagenes --}}
+<form action="/profile?_csrf={{csrfToken}}" method="post" enctype="multipart/form-data">
+  {{!-- <input type="hidden" name="_csrf" value="{{csrfToken}}" /> --}}
+  <div class="mb-3">
+    <input name="myFile" class="form-control" type="file" id="formFile">
+  </div>
+  <button class="btn btn-dark">Change img</button>
+</form>

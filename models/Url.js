@@ -19,6 +19,12 @@ const urlSchema = new Schema({
     // Solo para nanoid, tambien se puede crear en el controlador
     // default: () => nanoid(10),
   },
+  user: {
+    type: Schema.Types.ObjectId,
+    // Hace referencia al modelo User
+    ref: 'User',
+    required: true,
+  },
 });
 
 // Creamos el modelo pasandole el nombre de la coleccion y el Schema

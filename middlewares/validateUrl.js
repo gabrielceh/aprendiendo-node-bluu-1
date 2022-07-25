@@ -11,14 +11,22 @@ const validateUrl = (req, res, next) => {
         // En caso que sea una url valida, pasara al sgte middleware, en este caso para crear o editar
         return next();
       } else {
-        throw new Error('No valida 🤔');
+        console.log('mal');
+        throw new Error('❌ The URL needs the protocol http:// or https://');
       }
-    } else {
-      throw new Error('No valida 🤔');
     }
+    console.log(urlFrontend.protocol);
+    console.log(urlFrontend.origin);
+    throw new Error('❌ Invalid url');
   } catch (error) {
-    console.log(error);
-    res.send('❌ Error');
+    console.log(error.message);
+    // res.send('❌ Error');
+    if (error.message === 'Invalid URL') {
+      req.flash('messages', [{ msg: '❌ Invalid url' }]);
+    } else {
+      req.flash('messages', [{ msg: error.message }]);
+    }
+    return res.redirect('/');
   }
 };
 

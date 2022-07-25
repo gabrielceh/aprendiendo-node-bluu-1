@@ -8,17 +8,21 @@ const {
   editUrl,
   toRedirect,
 } = require('../controllers/homeController');
+const { formPerfil, editProfilePhoto } = require('../controllers/profileController');
 const validateUrl = require('../middlewares/validateUrl');
 const verifyUserDB = require('../middlewares/verifyUserDB');
 
 //creamos la ruta inicial
 router.get('/', verifyUserDB, readUrls);
-router.post('/', validateUrl, addUrls);
+router.post('/', verifyUserDB, validateUrl, addUrls);
 
-router.get('/delete/:id', deleteUrl);
+router.get('/delete/:id', verifyUserDB, deleteUrl);
 
-router.get('/edit/:id', editUrlForm);
-router.post('/edit/:id', validateUrl, editUrl);
+router.get('/edit/:id', verifyUserDB, editUrlForm);
+router.post('/edit/:id', verifyUserDB, validateUrl, editUrl);
+
+router.get('/profile', verifyUserDB, formPerfil);
+router.post('/profile', verifyUserDB, editProfilePhoto);
 
 router.get('/:shortUrl', toRedirect);
 

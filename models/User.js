@@ -27,6 +27,10 @@ const userSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  image: {
+    type: String,
+    default: null,
+  },
 });
 
 // Usamos un pre para que haga algo antes del el schema, en este caso, guardar la contraseña hasheada
