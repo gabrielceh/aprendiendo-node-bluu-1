@@ -56,7 +56,7 @@ const registerUser = async (req, res) => {
       to: user.email, // list of receivers
       subject: 'Check your account ✔', // Subject line
       // text: "Hello world?", // plain text body
-      html: `<a href="${PATHHEROKU || 'http://localhost:5000'}/auth/confirm-account/${
+      html: `<a href="${PATHHEROKU || 'http://localhost:5000/'}auth/confirm-account/${
         user.tokenConfirm
       }">Check your account here!</a>`, // html body
     });
