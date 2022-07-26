@@ -35,9 +35,9 @@ const corsOptions = {
   origin: process.env.PATHHEROKU || '*',
   methods: ['GET', 'POST'],
 };
-
 app.use(cors(corsOptions));
 
+app.set('trust proxy', 1);
 // https://expressjs.com/en/resources/middleware/session.html
 app.use(
   session({
