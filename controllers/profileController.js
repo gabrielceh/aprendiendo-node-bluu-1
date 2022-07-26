@@ -7,6 +7,7 @@ const Jimp = require('jimp');
 const path = require('path');
 const fs = require('fs');
 const User = require('../models/User');
+const { loginForm } = require('./authController');
 
 module.exports.formPerfil = async (req, res) => {
   try {
@@ -22,6 +23,7 @@ module.exports.formPerfil = async (req, res) => {
 module.exports.editProfilePhoto = async (req, res, next) => {
   const form = new formidable.IncomingForm();
   form.maxFileSize = 2 * 1024 * 1024; // 5mb
+  form.uploadDir = path.join(__dirname, `../public/assets/profiles`);
   const imgTypes = ['image/png', 'image/jpeg'];
 
   // Procesamos la imagen
@@ -52,6 +54,8 @@ module.exports.editProfilePhoto = async (req, res, next) => {
       const dirFile = path.join(__dirname, `../public/assets/profiles/${req.user.id}.${extension}`);
       // console.log(dirFile);
       // renombra un archivo (param 1) con un nuevo nombre(param 2) y lo guarda
+      console.log(file.uploadDir);
+      console.log(file.filepath);
       fs.renameSync(file.filepath, dirFile);
 
       // Leemos el archivo
@@ -69,13 +73,12 @@ module.exports.editProfilePhoto = async (req, res, next) => {
       await user.save();
 
       req.flash('messages', [{ msg: 'Image uploaded successfully 🥳' }]);
-      // return res.redirect('/profile');
+      return res.redirect('/profile');
     } catch (error) {
       console.log(error);
       req.flash('messages', [{ msg: error.message }]);
-      // return res.redirect('/profile');
-    } finally {
       return res.redirect('/profile');
+      // return res.redirect('/profile');
     }
   });
 };

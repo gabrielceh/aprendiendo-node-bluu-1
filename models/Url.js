@@ -9,7 +9,7 @@ const urlSchema = new Schema({
   // Aqui estaran las propiedades
   origin: {
     type: String,
-    unique: true,
+    // unique: true,
     required: true,
   },
   shortURL: {
